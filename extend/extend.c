@@ -20,7 +20,19 @@ void switch_indeces(char *const matrix, const char index_to_switch, const char z
     matrix[zero_index] = temp;
 }
 
-void generate_next_matrices_according_to_the_next_indeces_and_current_matrix(Next_Indeces *const next_indeces, const char *const current_matrix, const char current_zero_index, const char previous_zero_index, char *const storage)
+char check_if_previous_index_already_visited(const char index, const char *const previous_indeces)
+{
+    char result = 0b0;
+
+    for ( char i = 0; i < P_INDEX; i++ )
+    {
+        if ( index == previous_indeces[i] ) { result = 0b1; break; }
+    }
+
+    return result;
+}
+
+void generate_next_matrices_according_to_the_next_indeces_and_current_matrix(Next_Indeces *const next_indeces, const char *const current_matrix, const char current_zero_index, const char *const previous_zero_indeces, char *const storage)
 {
     char nb_indeces = next_indeces->nb_states;
 
@@ -28,7 +40,7 @@ void generate_next_matrices_according_to_the_next_indeces_and_current_matrix(Nex
 
     for( char i = 0; i < nb_indeces; i++ )
     {
-        if ( previous_zero_index ==  next_indeces->indeces[i]) { next_indeces->nb_states--; continue; }
+        if ( check_if_previous_index_already_visited(next_indeces->indeces[i], previous_zero_indeces) ) { next_indeces->nb_states--; continue; }
 
         void *curr_ptr_sto = (storage + (j * DIM));
 
@@ -47,26 +59,26 @@ char evaluate_the_cost_of_each_next_matrix_and_select_the_cost_index_with_min_co
     return select_the_cost_index_with_min_cost(c, nb_element);
 }
 
-State generate_next_state_according_to_the_min_cost(const char min_cost_index, const char *const storage, const char parent_zero_index)
+State generate_next_state_according_to_the_min_cost(const char min_cost_index, const char *const storage, const char parent_zero_index, const char *const previous_parent_zero_index)
 {
     const char *const matrix = storage + (min_cost_index * DIM);
 
     char zero_index = find_zero_index(matrix, DIM);
 
-    return generate_state(matrix, zero_index, parent_zero_index);
+    return generate_state(matrix, zero_index, parent_zero_index, previous_parent_zero_index);
 }
 
 char generate_next_state_according_to_the_cost_function_and_add_it_to_the_frontier(const State *const current, Frontier *const frontier)
 {
-    Next_Indeces n = generate_next_indeces(current->zero_index, SIDE);
+    Next_Indeces next_indeces = generate_next_indeces(current->zero_index, SIDE);
 
     char next_matrices[DIM_INDEX];
 
-    generate_next_matrices_according_to_the_next_indeces_and_current_matrix(&n, current->matrix, current->zero_index, current->parent_zero_index, next_matrices);
+    generate_next_matrices_according_to_the_next_indeces_and_current_matrix(&next_indeces, current->matrix, current->zero_index, current->parent_zero_indeces, next_matrices);
 
-    char min_const_index = evaluate_the_cost_of_each_next_matrix_and_select_the_cost_index_with_min_cost(next_matrices, n.nb_states);
+    char min_const_index = evaluate_the_cost_of_each_next_matrix_and_select_the_cost_index_with_min_cost(next_matrices, next_indeces.nb_states);
 
-    State next_state = generate_next_state_according_to_the_min_cost(min_const_index, next_matrices, current->zero_index);
+    State next_state = generate_next_state_according_to_the_min_cost(min_const_index, next_matrices, current->zero_index, current->parent_zero_indeces);
 
     return add_state_to_the_frontier(&next_state, frontier);
 }

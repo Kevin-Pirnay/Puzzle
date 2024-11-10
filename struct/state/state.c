@@ -5,9 +5,21 @@
 #include "../../utility/utility.h"
 
 
-State generate_state(const char *const matrix, const char zero_index, const char parent_zero_index)
+void store_parent_zero_indeces(const char *const previous_parent_zero_indeces, const char parent_zero_index, char *const new_parent_zero_indeces)
 {
-    State new_state = { .parent_zero_index = parent_zero_index, .zero_index = zero_index };
+    for ( char i = P_INDEX - 1; i > 0; i-- )
+    {
+        new_parent_zero_indeces[i] = previous_parent_zero_indeces[i - 1];
+    }
+
+    new_parent_zero_indeces[0] = parent_zero_index;
+}
+
+State generate_state(const char *const matrix, const char zero_index, const char parent_zero_index,const char *const previous_parent_zero_indeces)
+{
+    State new_state = { .zero_index = zero_index };
+
+    store_parent_zero_indeces(previous_parent_zero_indeces, parent_zero_index, new_state.parent_zero_indeces);
 
     cpy_in_memory(new_state.matrix, matrix, DIM);
 
@@ -24,7 +36,9 @@ void print_state(const State *const state)
 
     printf("index zero : %d\n", state->zero_index);
 
-    printf("parent index zero : %d\n", state->parent_zero_index);
+    printf("parent index zero :\n");
+
+    print_array(state->parent_zero_indeces, P_INDEX);
 
     printf("\n");
 }
@@ -46,7 +60,9 @@ void print_state_matrix(const State *const state)
 
     printf("index zero : %d\n", state->zero_index);
 
-    printf("parent index zero : %d\n", state->parent_zero_index);
+    printf("parent index zero :\n");
+
+    print_array(state->parent_zero_indeces, P_INDEX);
 
     printf("\n");
 }
@@ -57,7 +73,7 @@ char verify_state_struc_memory_integrity(const State *const state)
 
     char last_byte = *((char *) state + sizeof(State) - 1);
 
-    if ( last_byte == state->parent_zero_index ) result = 0b1;
+    if ( last_byte == state->zero_index ) result = 0b1;
 
     return result;
 }

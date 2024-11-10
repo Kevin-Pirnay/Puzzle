@@ -41,7 +41,9 @@ State generate_initial_state()
 
     char zero_index = find_zero_index(matrix, DIM);
 
-    return generate_state(matrix, zero_index, 0);
+    char previous_zero_indeces[] = { 0, 0 };
+
+    return generate_state(matrix, zero_index, 0, previous_zero_indeces);
 }
 
 char generate_initial_state_and_add_it_to_the_frontier(Frontier *const frontier)

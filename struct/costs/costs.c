@@ -75,12 +75,7 @@ char select_the_cost_index_with_min_cost(Costs c, const char nb_element)
         }
     }
 
-
     shuffle(min_indeces, nb_indeces);
 
-    printf("number of elemen to shuffle : %d -- selected index : %d\n", nb_indeces, min_indeces[0]);
-
-    print_array(min_indeces, nb_indeces);
-    
     return min_indeces[0];
 }
