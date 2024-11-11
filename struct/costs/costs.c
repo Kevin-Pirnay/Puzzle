@@ -46,41 +46,76 @@ void reinit_min_indeces(char *const min_indeces, char *const nb_indeces)
     *nb_indeces = 0;
 }
 
+typedef struct
+{
+    int invert[INDEX];
+
+    int total_of_invert;
+
+    int total;
+}
+ Sum;
+
 char select_the_cost_index_with_min_cost(Costs c, const char nb_element)
 {
-    int current_value = MAX_VALUE;
+    Sum s = { 0 };
 
-    char min_indeces[INDEX];
+    for ( char i = 0; i < nb_element; i++ ) s.total += c.costs[i];
 
-    char nb_indeces = 0;
+    for ( char i = 0; i < nb_element; i++ ) s.invert[i] = s.total - c.costs[i]; 
+    
+    for ( char i = 0; i < nb_element; i++ ) s.total_of_invert += s.invert[i];
 
-    for (char i = 0; i < nb_element; i++)
+    int random = 0;
+
+    if ( s.total_of_invert ) random = rand() % s.total_of_invert;
+
+    int total = 0;
+
+    char index = 0;
+
+    for ( char i = 0; i < nb_element; i++ )
     {
-        if ( c.costs[i] < current_value ) 
-        {
-            current_value = c.costs[i];
+        total += s.invert[i];
 
-            reinit_min_indeces(min_indeces, &nb_indeces);
-
-            min_indeces[nb_indeces] = i;
-
-            nb_indeces++;
-        }
-
-        else if ( c.costs[i] == current_value )
-        {
-            min_indeces[nb_indeces] = i;
-
-            nb_indeces++;
-        }
+        if ( random <= total ) { index = i; break; }
     }
 
+    printf("random min cost selected : %d\n", c.costs[index]);
 
-    shuffle(min_indeces, nb_indeces);
-
-    printf("number of elemen to shuffle : %d -- selected index : %d\n", nb_indeces, min_indeces[0]);
-
-    print_array(min_indeces, nb_indeces);
-    
-    return min_indeces[0];
+    return index;
 }
+
+
+// char select_the_cost_index_with_min_cost(Costs c, const char nb_element)
+// {
+//     int current_value = MAX_VALUE;
+
+//     char min_indeces[INDEX];
+
+//     char nb_indeces = 0;
+
+//     for (char i = 0; i < nb_element; i++)
+//     {
+//         if ( c.costs[i] < current_value ) 
+//         {
+//             current_value = c.costs[i];
+
+//             reinit_min_indeces(min_indeces, &nb_indeces);
+
+//             min_indeces[nb_indeces] = i;
+
+//             nb_indeces++;
+//         }
+
+//         else if ( c.costs[i] == current_value )
+//         {
+//             min_indeces[nb_indeces] = i;
+
+//             nb_indeces++;
+//         }
+//     }
+//     shuffle(min_indeces, nb_indeces);
+    
+//     return min_indeces[0];
+// }

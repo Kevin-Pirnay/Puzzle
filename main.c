@@ -6,7 +6,7 @@
 #include "./init/init.h"
 #include "./extend/extend.h"
 
-#define LIMIT 100
+#define LIMIT 5000000
 
 int main()
 {
